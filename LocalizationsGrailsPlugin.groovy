@@ -1,7 +1,7 @@
 import org.grails.plugins.localization.*
 
 class LocalizationsGrailsPlugin {
-    def version = "1.5-EEVOL-SNAPSHOT"
+    def version = "1.6-EEVOL-SNAPSHOT"
     def grailsVersion = "2.0 > *"
     def dependsOn = [:]
     def author = "Paul Fernley"
