@@ -1,7 +1,7 @@
 import org.grails.plugins.localization.*
 
 class LocalizationsGrailsPlugin {
-    def version = "1.4.4.14"
+    def version = "1.5-EEVOL-SNAPSHOT"
     def grailsVersion = "2.0 > *"
     def dependsOn = [:]
     def author = "Paul Fernley"
@@ -17,7 +17,7 @@ It will do the following:
 
 In addtion the plugin also has these added features to help you:
 * A CRUD UI to add, delete, and update i18n messages
-* A cache for increased speed 
+* A cache for increased speed
 * A JSONP action which can be useful in client-side templating.
 
 Asumptions:

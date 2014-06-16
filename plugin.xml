@@ -1,4 +1,4 @@
-<plugin name='localizations' version='1.4.4.14' grailsVersion='2.0 &gt; *'>
+<plugin name='localizations' version='1.5-EEVOL-SNAPSHOT' grailsVersion='2.0 &gt; *'>
   <author>Paul Fernley</author>
   <authorEmail>paul@pfernley.orangehome.co.uk</authorEmail>
   <title>Localizations (messages) plugin</title>
@@ -11,7 +11,7 @@ It will do the following:
 
 In addtion the plugin also has these added features to help you:
 * A CRUD UI to add, delete, and update i18n messages
-* A cache for increased speed 
+* A cache for increased speed
 * A JSONP action which can be useful in client-side templating.
 
 Asumptions:
@@ -27,13 +27,4 @@ Asumptions:
     <resource>org.grails.plugins.localization.LocalizationService</resource>
     <resource>org.grails.plugins.localization.LocalizationTagLib</resource>
   </resources>
-  <repositories>
-    <repository name='grailsCentral' url='http://grails.org/plugins' />
-    <repository name='http://repo.grails.org/grails/core' url='http://repo.grails.org/grails/core/' />
-    <repository name='mavenCentral' url='http://repo1.maven.org/maven2/' />
-  </repositories>
-  <dependencies />
-  <plugins />
-  <runtimePluginRequirements />
-  <behavior />
 </plugin>

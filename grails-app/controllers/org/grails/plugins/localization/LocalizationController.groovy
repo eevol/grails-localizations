@@ -3,8 +3,10 @@ package org.grails.plugins.localization
 import org.grails.plugins.localization.*
 import grails.converters.JSON
 import org.springframework.context.i18n.LocaleContextHolder as LCH
+import grails.transaction.Transactional
 
 
+@Transactional(readOnly = true)
 class LocalizationController {
 
     def localizationService
@@ -39,7 +41,7 @@ class LocalizationController {
             def setting = grailsApplication.getDomainClass('org.grails.plugins.settings.Setting')?.newInstance()
             if(!setting) //compatibility with Settings plugin v. 1.0
                 setting = grailsApplication.getDomainClass('Setting')?.newInstance()
-            
+
             max = setting.valueFor("pagination.max", max)
             dflt = setting.valueFor("pagination.default", dflt)
         }
@@ -79,7 +81,8 @@ class LocalizationController {
         }
     }
 
-    def delete = {
+    @Transactional
+    def delete(){
         withLocalization { localization ->
             localization.delete()
             Localization.resetThis(localization.code)
@@ -96,7 +99,8 @@ class LocalizationController {
         }
     }
 
-    def update = {
+    @Transactional
+    def update(){
         def localization = Localization.get( params.id )
         if(localization) {
             def oldCode = localization.code
@@ -217,7 +221,7 @@ class LocalizationController {
 
     // returns localizations as jsonp. Useful for displaying text in client side templates.
     // It is possible to limit the messages returned by providing a codeBeginsWith parameter
-    // Currently, there is no caching. Will have to add. 
+    // Currently, there is no caching. Will have to add.
     def jsonp = {
       def currentLocale = LCH.getLocale() //.toString.replaceAll('_','')
       def padding = params.padding ?: 'messages' //JSONP
@@ -237,7 +241,7 @@ class LocalizationController {
       }
       render "$padding=${localizationsMap as JSON};"
     }
-    
+
     private def withLocalization(id="id", Closure c) {
         def localization = Localization.get(params[id])
         if(localization) {

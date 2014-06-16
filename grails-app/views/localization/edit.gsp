@@ -22,7 +22,7 @@
                 <g:renderErrors bean="${localization}" as="list" />
             </div>
             </g:hasErrors>
-            <g:form method="post" >
+            <g:form action="update" controller="localization" method="post" >
                 <input type="hidden" name="id" value="${localization?.id}" />
                 <g:render plugin="localizations" template="dialog" model="[localization: localization]" />
                 <div class="buttons">
