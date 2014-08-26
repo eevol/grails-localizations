@@ -26,12 +26,30 @@
                                 <td valign="top" class="value">
                                     <g:select name="file" from="${names}"/>&nbsp;<g:localizationHelpBalloon code="localization.imports.file" />
                                 </td>
+
+                                <td valign="top" class="value">
+                                  <label>
+                                    <g:checkBox name="forceUpdate" value="${false}"/> <g:message code="localization.imports.forceupdate", default="Force Update"/>
+                                  </label>
+                                </td>
                             </tr>
                         </tbody>
                     </table>
                 </div>
                 <div class="buttons">
                     <span class="button"><input class="save" type="submit" value="${message(code:'localization.imports.import', 'default':'Import')}" /></span>
+                </div>
+                <div class="buttons">
+                    <span class="button"><g:link controller="localization" action="reload" onclick="return confirm('All Translations in DB will be overwritten. Maybe Export first to keep a backup. Are you sure to continue?')">${message(code:'localization.imports.reloadall', 'default':'Reload from Disk')}"</g:link>
+                </div>
+            </g:form>
+
+            <g:form action="export" method="get" >
+                <div class="dialog">
+                  <g:select name="locale" from="${uniqLocales}"/>
+                </div>
+                <div class="buttons">
+                    <span class="button"><input class="save" type="submit" value="${message(code:'localization.imports.export', 'default':'Export')}" /></span>
                 </div>
             </g:form>
         </div>

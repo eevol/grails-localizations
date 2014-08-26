@@ -26,7 +26,7 @@ class Localization implements Serializable {
     Byte relevance = 0
     String text
     Date dateCreated
-    Date lastUpdated    
+    Date lastUpdated
 
     static mapping = {
         columns {
@@ -53,7 +53,7 @@ class Localization implements Serializable {
           return new Locale(locale)
         default:
           return null
-      }  
+      }
     }
 
     static String decodeMessage(String code, Locale locale) {
@@ -195,7 +195,7 @@ class Localization implements Serializable {
               grailsApplication.mainContext.getResources("**/WEB-INF/**/grails-app/i18n/**/*.properties")?.toList().each {
                 messageFiles << it.file
               }
-            } else { 
+            } else {
               def i18nDirs = []
               GrailsPluginUtils.getPluginI18nDirectories().each { i18nDirs << it.file }
               i18nDirs << new File(new File(path).getParent(), "grails-app${File.separator}i18n")
@@ -203,22 +203,22 @@ class Localization implements Serializable {
                 if (dir.exists() && dir.canRead()) {
                   def p = ~/.*\.properties/
                   dir.eachFileMatch(p) { messageFiles << it }
-                }                
+                }
               }
             }
-            messageFiles.each { 
+            messageFiles.each {
               def locale = getLocaleForFileName(it.name)
               Localization.loadPropertyFile(it, locale)
             }
         }
-             
+
         def size = grailsApplication.config.localizations.cache.size.kb
         if (size != null && size instanceof Integer && size >= 0 && size <= 1024 * 1024) {
             maxCacheSize = size * 1024L
-        }        
+        }
     }
 
-    static loadPropertyFile(file, locale) {
+    static loadPropertyFile(file, locale, Boolean forceUpdate = false) {
         def loc = locale ? locale.getLanguage() + locale.getCountry() : "*"
         def props = new Properties()
         def reader = new BufferedReader(new InputStreamReader(new FileInputStream(file), "UTF-8"))
@@ -227,11 +227,12 @@ class Localization implements Serializable {
         } finally {
             if (reader) reader.close()
         }
-
+        println("Loading and Forcing Update? "+forceUpdate)
         def rec, txt
         def counts = [imported: 0, skipped: 0]
         props.stringPropertyNames().each {key ->
             rec = Localization.findByCodeAndLocale(key, loc)
+            // If forceUpdate is set, import new Keys anyway
             if (!rec) {
                 txt = props.getProperty(key)
                 rec = new Localization([code: key, locale: loc, text: txt])
@@ -242,7 +243,20 @@ class Localization implements Serializable {
                     counts.skipped++
                 }
             } else {
-                counts.skipped++
+                if(forceUpdate){
+                    //we have to Update the field
+                    txt = props.getProperty(key)
+                    rec.text = txt
+                    if (rec.validate()) {
+                        rec.save()
+                        counts.imported++
+                    } else {
+                        println rec.errors
+                        counts.skipped++
+                    }
+                }else{
+                    counts.skipped++
+                }
             }
         }
 
@@ -281,16 +295,16 @@ class Localization implements Serializable {
             }
         }
     }
-    
+
     static getLocaleForFileName(String fileName) {
         def locale = null
-        
+
         if (fileName ==~ /.+_[a-z][a-z]_[A-Z][A-Z]\.properties$/) {
             locale = new Locale(fileName.substring(fileName.length() - 16, fileName.length() - 14), fileName.substring(fileName.length() - 13, fileName.length() - 11))
         } else if (fileName ==~ /.+_[a-z][a-z]\.properties$/) {
             locale = new Locale(fileName.substring(fileName.length() - 13, fileName.length() - 11))
         }
-        
+
         locale
     }
 

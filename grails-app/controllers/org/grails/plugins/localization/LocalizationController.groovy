@@ -154,6 +154,18 @@ class LocalizationController {
         redirect(action:cache)
     }
 
+    @Transactional
+    def reload(){
+        Localization.reload()
+        Localization.resetAll()
+        redirect(action:list)
+    }
+
+    def export(String locale){
+        def props = Localization.findAllByLocale(locale)
+        [localizationList:props.sort{it.code}]
+    }
+
     def imports = {
       // The following line has the effect of checking whether this plugin
       // has just been installed and, if so, gets the plugin to load all
@@ -177,11 +189,18 @@ class LocalizationController {
         }
       }
 
-      return [names: names]
+      return [names: names, uniqLocales:getLocales()]
     }
 
-    def load = {
+    @Transactional
+    def load(){
         def name = params.file
+        def forceUpdate = false
+        if(params.forceUpdate == 'on'){
+            forceUpdate = true
+            log.warn "Forcing Update of Message Values on import"
+        }
+
         if (name) {
             name += ".properties"
             def path = servletContext.getRealPath("/")
@@ -191,8 +210,8 @@ class LocalizationController {
                     def file = new File(dir, name)
                     if (file.isFile() && file.canRead()) {
                         def locale = Localization.getLocaleForFileName(name)
-
-                        def counts = Localization.loadPropertyFile(file, locale)
+                        log.warn "Forcing Update check:"+forceUpdate
+                        def counts = Localization.loadPropertyFile(file, locale, forceUpdate)
                         flash.message = "localization.imports.counts"
                         flash.args = [counts.imported, counts.skipped]
                         flash.defaultMessage = "Imported ${counts.imported} key(s). Skipped ${counts.skipped} key(s)."
