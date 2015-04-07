@@ -1,12 +1,13 @@
 package org.grails.plugins.localization
 
 import org.grails.plugins.localization.*
+import grails.util.Holders
 
 class LocalizationService {
 
     boolean transactional = true
 
     def hasPlugin(name) {
-        return org.codehaus.groovy.grails.plugins.PluginManagerHolder.getPluginManager()?.hasGrailsPlugin(name)
+        return Holders.currentPluginManager()?.hasGrailsPlugin(name)
     }
 }
