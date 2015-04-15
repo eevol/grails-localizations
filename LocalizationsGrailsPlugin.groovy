@@ -1,8 +1,8 @@
 import org.grails.plugins.localization.*
 
 class LocalizationsGrailsPlugin {
-    def version = "1.8.7-EEVOL-SNAPSHOT"
-    def grailsVersion = "2.4 > *"
+    def version = "1.8.7-SNAPSHOT"
+    def grailsVersion = "2.3 > *"
     def dependsOn = [:]
     def author = "Paul Fernley"
     def authorEmail = "paul@pfernley.orangehome.co.uk"
@@ -46,5 +46,4 @@ Asumptions:
             serviceClass.metaClass.message = { Map parameters -> Localization.getMessage(parameters) }
         }
     }
-
 }
