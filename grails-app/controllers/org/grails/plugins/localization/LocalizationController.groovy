@@ -4,6 +4,7 @@ import org.grails.plugins.localization.*
 import grails.converters.JSON
 import org.springframework.context.i18n.LocaleContextHolder as LCH
 import grails.transaction.Transactional
+import org.springframework.web.multipart.MultipartFile
 
 
 @Transactional(readOnly = true)
@@ -165,6 +166,28 @@ class LocalizationController {
         def props = Localization.findAllByLocale(locale)
         [localizationList:props.sort{it.code}]
     }
+
+    def import(String locale) {
+        MultipartFile file = request.getFile('localeFile')
+
+        if(!file || file.isEmpty()) {
+            log.warn("No file has been uploaded")
+            flash.message = "localization.import.missingfile"
+        }
+
+        if(!locale) {
+            log.warn("No locale selected")
+            flash.message = "localization.import.missinglocale"
+        }
+
+        def uploadPath = grailsApplication.config.sensefleet.upload.path
+        def fileName = "translations_${locale}_${System.currentTimeInMillis()}"
+        def pathToFile = "${uploadPath}${File.separator}${fileName}"
+        file.transferTo(pathToFile)
+        Locale locale = new Locale(locale)
+        // FIXME incomplete
+    }
+
 
     def imports = {
       // The following line has the effect of checking whether this plugin

@@ -231,7 +231,6 @@ class Localization implements Serializable {
         } finally {
             if (reader) reader.close()
         }
-        println("Loading and Forcing Update? "+forceUpdate)
         def rec, txt
         def counts = [imported: 0, skipped: 0]
         props.stringPropertyNames().each {key ->
