@@ -167,7 +167,7 @@ class LocalizationController {
         [localizationList:props.sort{it.code}]
     }
 
-    def import(String locale) {
+    def import(String locale, Boolean forceUpdate) {
         MultipartFile file = request.getFile('localeFile')
 
         if(!file || file.isEmpty()) {
@@ -180,11 +180,13 @@ class LocalizationController {
             flash.message = "localization.import.missinglocale"
         }
 
+        log.warn "Forcing Update check: ${forceUpdate}"
+
         Locale locale = new Locale(locale)
-
-
-
-
+        def counts = Localization.loadPropertyFile(file, locale, forceUpdate)
+        flash.message = "localization.imports.counts"
+        flash.args = [counts.imported, counts.skipped]
+        flash.defaultMessage = "Imported ${counts.imported} key(s). Skipped ${counts.skipped} key(s)."
     }
 
 
