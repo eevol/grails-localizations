@@ -180,12 +180,11 @@ class LocalizationController {
             flash.message = "localization.import.missinglocale"
         }
 
-        def uploadPath = grailsApplication.config.sensefleet.upload.path
-        def fileName = "translations_${locale}_${System.currentTimeInMillis()}"
-        def pathToFile = "${uploadPath}${File.separator}${fileName}"
-        file.transferTo(pathToFile)
         Locale locale = new Locale(locale)
-        // FIXME incomplete
+
+
+
+
     }
 
 

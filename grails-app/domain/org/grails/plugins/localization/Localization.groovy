@@ -8,6 +8,7 @@ import org.codehaus.groovy.grails.plugins.GrailsPluginUtils
 import org.codehaus.groovy.grails.web.context.ServletContextHolder
 import org.springframework.web.context.request.RequestContextHolder
 import org.springframework.web.context.support.WebApplicationContextUtils
+import org.springframework.web.multipart.MultipartFile
 import org.springframework.web.servlet.support.RequestContextUtils
 
 
@@ -222,10 +223,21 @@ class Localization implements Serializable {
         }
     }
 
-    static loadPropertyFile(file, locale, Boolean forceUpdate = false) {
+    static loadPropertyFile(MultipartFile file, locale, Boolean forceUpdate = false) {
+        def inputStream = file.getInputStream()
+        return loadPropertyFile(inputStream, locale, forceUpdate)
+    }
+
+    static loadPropertyFile(File file, locale, Boolean forceUpdate = false) {
+        InputStream inputStream = new FileInputStream(file)
+        return loadPropertyFile(inputStream, locale, forceUpdate)
+    }
+
+    static loadPropertyFile(InputStream inputStream, locale, Boolean forceUpdate = false) {
         def loc = locale ? locale.getLanguage() + locale.getCountry() : "*"
         def props = new Properties()
-        def reader = new BufferedReader(new InputStreamReader(new FileInputStream(file), "UTF-8"))
+        def inputStreamReader = new InputStreamReader(inputStream, "UTF-8")
+        def reader = new BufferedReader(inputStreamReader)
         try {
             props.load(reader)
         } finally {
