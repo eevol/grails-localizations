@@ -15,8 +15,13 @@ class LocalizationController {
 
     def beforeInterceptor = [action: this.&getLocales, only: ['list', 'search']]
 
-    private def getLocales = {
+    protected def getLocales = {
         uniqLocales = Localization.list()*.locale.unique().sort()
+    }
+
+    protected def getAvailableLocales = {
+        def locales = Locale.getAvailableLocales()*.getLanguage()
+        locales.unique().sort()
     }
 
     def index = { redirect(action:list,params:params) }
@@ -167,28 +172,39 @@ class LocalizationController {
         [localizationList:props.sort{it.code}]
     }
 
-    def import(String locale, Boolean forceUpdate) {
-        MultipartFile file = request.getFile('localeFile')
+    @Transactional
+    def upload(String locale, Boolean forceUpdate) {
+        if(request.post) {
+            MultipartFile file = request.getFile('localeFile')
 
-        if(!file || file.isEmpty()) {
-            log.warn("No file has been uploaded")
-            flash.message = "localization.import.missingfile"
+            if (!file || file.isEmpty()) {
+                log.warn("No file has been uploaded")
+                flash.message = "localization.import.missingfile"
+                render(view:"upload", model:[availableLocales:getAvailableLocales()])
+                return
+            }
+
+            if (!locale) {
+                log.warn("No locale selected")
+                flash.message = "localization.import.missinglocale"
+                render(view:"upload", model:[availableLocales:getAvailableLocales()])
+                return
+            }
+
+            log.warn "Forcing Update check: ${forceUpdate}"
+
+            Locale localeInstance = new Locale(locale)
+
+            def counts = Localization.loadPropertyFile(file, localeInstance, forceUpdate)
+            flash.message = "localization.imports.counts"
+            flash.args = [counts.imported, counts.skipped]
+            flash.defaultMessage = "Imported ${counts.imported} key(s). Skipped ${counts.skipped} key(s)."
+
+            log.info("Imported ${counts.imported} key(s). Skipped ${counts.skipped} key(s).")
+
         }
-
-        if(!locale) {
-            log.warn("No locale selected")
-            flash.message = "localization.import.missinglocale"
-        }
-
-        log.warn "Forcing Update check: ${forceUpdate}"
-
-        Locale locale = new Locale(locale)
-        def counts = Localization.loadPropertyFile(file, locale, forceUpdate)
-        flash.message = "localization.imports.counts"
-        flash.args = [counts.imported, counts.skipped]
-        flash.defaultMessage = "Imported ${counts.imported} key(s). Skipped ${counts.skipped} key(s)."
+        [availableLocales:getAvailableLocales()]
     }
-
 
     def imports = {
       // The following line has the effect of checking whether this plugin
