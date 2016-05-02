@@ -4,6 +4,7 @@ package org.grails.plugins.localization
 import grails.util.GrailsWebUtil
 import grails.util.Environment
 import grails.util.BuildSettingsHolder
+import grails.util.Holders
 import org.codehaus.groovy.grails.plugins.GrailsPluginUtils
 import org.codehaus.groovy.grails.web.context.ServletContextHolder
 import org.springframework.web.context.request.RequestContextHolder
@@ -29,7 +30,7 @@ class Localization implements Serializable {
     Date dateCreated
     Date lastUpdated
 
-    static mapping = {
+    static mapping = Holders.config.grails.plugin.localizations.mapping ?: {
         columns {
             code index: "localizations_idx"
             locale column: "loc"
@@ -71,17 +72,13 @@ class Localization implements Serializable {
                 }
             }
         }
-
         if (!msg) {
-            def lst = []
-            Localization.withNewSession { status ->
-                lst = Localization.findAll(
+            Localization.withNewSession {
+                def lst = Localization.findAll(
                         "from org.grails.plugins.localization.Localization as x where x.code = ? and x.locale in ('*', ?, ?) order by x.relevance desc",
                         [code, locale.getLanguage(), locale.getLanguage() + locale.getCountry()])
+                msg = lst.size() > 0 ? lst[0].text : missingValue
             }
-
-            msg = lst.size() > 0 ? lst[0].text : missingValue
-
             if (maxCacheSize > 0) {
                 synchronized (cache) {
 
