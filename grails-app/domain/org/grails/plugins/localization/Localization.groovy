@@ -3,10 +3,8 @@ package org.grails.plugins.localization
 
 import grails.util.GrailsWebUtil
 import grails.util.Environment
-import grails.util.BuildSettingsHolder
 import grails.util.Holders
-import org.codehaus.groovy.grails.plugins.GrailsPluginUtils
-import org.codehaus.groovy.grails.web.context.ServletContextHolder
+import grails.web.context.ServletContextHolder
 import org.springframework.web.context.request.RequestContextHolder
 import org.springframework.web.context.support.WebApplicationContextUtils
 import org.springframework.web.multipart.MultipartFile
@@ -197,7 +195,7 @@ class Localization implements Serializable {
               grailsApplication.mainContext.getResources("**/WEB-INF/**/grails-app/i18n/**/*.properties")?.toList().each {
                 messageFiles << it.file
               }
-            } else {
+            } /*else {
               def i18nDirs = []
               GrailsPluginUtils.getPluginI18nDirectories().each { i18nDirs << it.file }
               i18nDirs << new File(new File(path).getParent(), "grails-app${File.separator}i18n")
@@ -207,7 +205,7 @@ class Localization implements Serializable {
                   dir.eachFileMatch(p) { messageFiles << it }
                 }
               }
-            }
+            }*/
             messageFiles.each {
               def locale = getLocaleForFileName(it.name)
               Localization.loadPropertyFile(it, locale)
