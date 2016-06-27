@@ -15,21 +15,23 @@ class LocalizationController {
 
     def beforeInterceptor = [action: this.&getLocales, only: ['list', 'search']]
 
-    protected def getLocales = {
+    protected def getLocales(){
         uniqLocales = Localization.list()*.locale.unique().sort()
     }
 
-    protected def getAvailableLocales = {
+    protected def getAvailableLocales(){
         def locales = Locale.getAvailableLocales()*.getLanguage()
         locales.unique().sort()
     }
 
-    def index = { redirect(action:list,params:params) }
+    def index(){
+        redirect(action:'list',params:params)
+    }
 
     // the delete, save and update actions only accept POST requests
     static allowedMethods = [delete:'POST', save:'POST', update:'POST', reset:'POST', load:'POST']
 
-    def list = {
+    def list(){
         // The following line has the effect of checking whether this plugin
         // has just been installed and, if so, gets the plugin to load all
         // message bundles from the i18n directory BEFORE we attempt to display
@@ -69,7 +71,7 @@ class LocalizationController {
         ]
     }
 
-    def search = {
+    def search(){
         params.max = (params.max && params.max.toInteger() > 0) ? Math.min(params.max.toInteger(), 50) : 20
         params.order = params.order ? params.order : (params.sort ? 'desc' : 'asc')
         params.sort = params.sort ?: "code"
@@ -81,7 +83,7 @@ class LocalizationController {
         ])
     }
 
-    def show = {
+    def show(){
         withLocalization { localization ->
             return [ localization : localization ]
         }
@@ -99,7 +101,7 @@ class LocalizationController {
         }
     }
 
-    def edit = {
+    def edit(){
         withLocalization { localization ->
             return [ localization : localization ]
         }
@@ -131,13 +133,13 @@ class LocalizationController {
         }
     }
 
-    def create = {
+    def create(){
         def localization = new Localization()
         localization.properties = params
         return ['localization':localization]
     }
 
-    def save = {
+    def save(){
         def localization = new Localization(params)
         if(!localization.hasErrors() && localization.save()) {
             Localization.resetThis(localization.code)
@@ -151,11 +153,11 @@ class LocalizationController {
         }
     }
 
-    def cache = {
+    def cache(){
         return [stats: Localization.statistics()]
     }
 
-    def reset = {
+    def reset(){
         Localization.resetAll()
         redirect(action:cache)
     }
@@ -206,7 +208,7 @@ class LocalizationController {
         [availableLocales:getAvailableLocales()]
     }
 
-    def imports = {
+    def imports(){
       // The following line has the effect of checking whether this plugin
       // has just been installed and, if so, gets the plugin to load all
       // message bundles from the i18n directory BEFORE we attempt to display
@@ -281,7 +283,7 @@ class LocalizationController {
     // returns localizations as jsonp. Useful for displaying text in client side templates.
     // It is possible to limit the messages returned by providing a codeBeginsWith parameter
     // Currently, there is no caching. Will have to add.
-    def jsonp = {
+    def jsonp(){
       def currentLocale = LCH.getLocale() //.toString.replaceAll('_','')
       def padding = params.padding ?: 'messages' //JSONP
       def localizations = Localization.createCriteria().list {
