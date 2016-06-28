@@ -16,7 +16,7 @@ spring:
     groovy:
         template:
             check-template-location: false
-			
+
 hibernate:
     cache:
         queries: false
